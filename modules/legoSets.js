@@ -1,12 +1,12 @@
 /********************************************************************************
- * WEB700 – Assignment 3
+ * WEB700 – Assignment 4
  *
  * I declare that this assignment is my own work in accordance with Seneca's
  * Academic Integrity Policy:
  *
  * https://www.senecapolytechnic.ca/about/policies/academic-integrity-policy.html
  *
- * Name: Huu Duc Huy Nguyen | Student ID: 125109249 | Date: 11th, Feb, 2025
+ * Name: Huu Duc Huy Nguyen | Student ID: 125109249 | Date: 26th, Feb, 2025
  *
  ********************************************************************************/
 
@@ -17,7 +17,7 @@ const NOT_FOUND_MESSAGE = 'Set not found';
 const SET_EMPTY_MESSAGE = 'Dataset is empty. Please run the initialize function first.';
 
 class LegoData {
-    static sets
+    static sets;
 
     constructor() {
         LegoData.sets = [];
@@ -50,7 +50,6 @@ class LegoData {
                 return reject(`Fail to initialize the sets data with: ${error.message}`);
             }
         })
-
     }
 
     getAllSets() {
@@ -77,7 +76,6 @@ class LegoData {
                 return reject(`Fail to get set with ID ${setNum}: ${error.message}`);
             }
         })
-
     }
 
     getSetsByTheme(themeName) {
@@ -95,6 +93,47 @@ class LegoData {
             }
         })
     }
+
+    addSet(newSet) {
+        return new Promise((resolve, reject) => {
+            try {
+                const setExists = LegoData.sets.some(set => set.set_num === newSet.set_num);
+
+                if (setExists) {
+                    reject("Set already exists");
+                } else {
+                    // Add the new set
+                    LegoData.sets.push({
+                        ...newSet,
+                        theme: this.getThemeNameById(newSet.theme_id),
+                    });
+                    resolve();
+                }
+            } catch (error) {
+                reject(`Failed to add the set: ${error.message}`);
+            }
+        });
+    }
+
+    removeSet(setNum) {
+        return new Promise((resolve, reject) => {
+            try {
+                LegoData.validateEmptyDataset();
+
+                const index = LegoData.sets.findIndex(set => set.set_num === setNum);
+
+                if (index !== -1) {
+                    LegoData.sets.splice(index, 1);
+                    resolve();
+                } else {
+                    reject(new Error(NOT_FOUND_MESSAGE));
+                }
+            } catch (error) {
+                reject(`Failed to remove set: ${error.message}`);
+            }
+        });
+    }
+
 }
 
 module.exports = { LegoData, NOT_FOUND_MESSAGE };

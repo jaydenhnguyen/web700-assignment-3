@@ -1,12 +1,12 @@
 /********************************************************************************
- * WEB700 – Assignment 3
+ * WEB700 – Assignment 4
  *
  * I declare that this assignment is my own work in accordance with Seneca's
  * Academic Integrity Policy:
  *
  * https://www.senecapolytechnic.ca/about/policies/academic-integrity-policy.html
  *
- * Name: Huu Duc Huy Nguyen | Student ID: 125109249 | Date: 11th, Feb, 2025
+ * Name: Huu Duc Huy Nguyen | Student ID: 125109249 | Date: 26th, Feb, 2025
  *
  ********************************************************************************/
 
@@ -17,6 +17,8 @@ const e = require("express");
 
 const app = express()
 const HTTP_PORT = 3000
+
+app.use(express.static('public'));
 
 /*Config API*/
 const send404Page = (res) => {
@@ -29,6 +31,10 @@ app.get(['/', '/home'], (req, res) => {
 
 app.get('/about', (req, res) => {
     res.sendFile(path.join(__dirname, '/views/about.html'));
+});
+
+app.get('/lego/add-set', (req, res) => {
+    res.sendFile(path.join(__dirname, '/views/add-set.html'));
 });
 
 app.get('/lego/sets', async (req, res) => {
@@ -63,6 +69,38 @@ app.get('/lego/sets/:set_num', async (req, res) => {
     }
 });
 
+app.get('/lego/add-test', (req, res) => {
+    res.sendFile(path.join(__dirname, '/views/add-set-demo.html'));
+});
+
+app.post('/lego/add-test', async (req, res) => {
+    const testSet = {
+        set_num: "123",
+        name: "Test Set Name",
+        year: "2024",
+        theme_id: "366",
+        num_parts: "500",
+        img_url: "https://fakeimg.pl/375x375?text=[+Lego+]"
+    };
+
+    try {
+        await legoData.addSet(testSet);
+        res.redirect('/lego/sets');
+    } catch (error) {
+        res.status(422).send(error);
+    }
+});
+
+app.post('/lego/remove-test', async (req, res) => {
+    const setNum = "123";
+
+    try {
+        await legoData.removeSet(setNum);
+        res.redirect('/lego/sets');
+    } catch (error) {
+        res.status(422).send(error);
+    }
+});
 
 /*Run the app*/
 const legoData = new LegoData();

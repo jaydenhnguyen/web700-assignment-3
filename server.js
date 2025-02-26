@@ -18,7 +18,7 @@ const e = require("express");
 const app = express()
 const HTTP_PORT = 3000
 
-app.use(express.static('public'));
+app.use(express.static(__dirname + '/public'))
 
 /*Config API*/
 const send404Page = (res) => {

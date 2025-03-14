@@ -1,12 +1,12 @@
 /********************************************************************************
- * WEB700 – Assignment 4
+ * WEB700 – Assignment 5
  *
  * I declare that this assignment is my own work in accordance with Seneca's
  * Academic Integrity Policy:
  *
  * https://www.senecapolytechnic.ca/about/policies/academic-integrity-policy.html
  *
- * Name: Huu Duc Huy Nguyen | Student ID: 125109249 | Date: 26th, Feb, 2025
+ * Name: Huu Duc Huy Nguyen | Student ID: 125109249 | Date: 14th, Mar, 2025
  *
  ********************************************************************************/
 
@@ -14,6 +14,7 @@ const { LegoData } = require("./modules/legoSets");
 const express = require('express');
 const path = require('path');
 const e = require("express");
+const {response} = require("express");
 
 const app = express()
 const HTTP_PORT = 3000
@@ -64,6 +65,34 @@ app.get('/lego/sets/:set_num', async (req, res) => {
         }
 
         res.json(set);
+    } catch (error) {
+        send404Page(res);
+    }
+});
+
+app.get('/lego/themes', async (req, res) => {
+    try {
+        const allThemes = await legoData.getAllThemes();
+
+        if (allThemes && allThemes.length > 0) return res.json(allThemes);
+
+        send404Page(res);
+    } catch (error) {
+        send404Page(res);
+    }
+});
+
+app.get('/lego/themes/:theme_id', async (req, res) => {
+    const { theme_id } = req.params;
+
+    try {
+        const theme = await legoData.getThemeById(theme_id);
+
+        if (!theme) {
+            return res.send({code: 404, message: 'Unable to find requested theme'});
+        }
+
+        res.json(theme);
     } catch (error) {
         send404Page(res);
     }

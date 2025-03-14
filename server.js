@@ -73,6 +73,11 @@ app.get('/lego/add-test', (req, res) => {
     res.sendFile(path.join(__dirname, '/views/add-set-demo.html'));
 });
 
+app.get('/*', (req, res) => {
+    res.sendFile(path.join(__dirname, '/views/404.html'));
+});
+
+
 app.post('/lego/add-test', async (req, res) => {
     const testSet = {
         set_num: "123",

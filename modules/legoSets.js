@@ -1,12 +1,12 @@
 /********************************************************************************
- * WEB700 – Assignment 4
+ * WEB700 – Assignment 5
  *
  * I declare that this assignment is my own work in accordance with Seneca's
  * Academic Integrity Policy:
  *
  * https://www.senecapolytechnic.ca/about/policies/academic-integrity-policy.html
  *
- * Name: Huu Duc Huy Nguyen | Student ID: 125109249 | Date: 26th, Feb, 2025
+ * Name: Huu Duc Huy Nguyen | Student ID: 125109249 | Date: 14th, Mar, 2025
  *
  ********************************************************************************/
 
@@ -18,15 +18,24 @@ const SET_EMPTY_MESSAGE = 'Dataset is empty. Please run the initialize function 
 
 class LegoData {
     static sets;
+    static themes;
 
     constructor() {
         LegoData.sets = [];
+        LegoData.themes = [];
         this.setData = setDataJson;
         this.themeData = themeDataJson;
     }
 
     static validateEmptyDataset() {
         if (!LegoData.sets || LegoData.sets.length <= 0) {
+            throw new Error(SET_EMPTY_MESSAGE);
+        }
+    }
+
+
+    static validateEmptyDataThemes() {
+        if (!LegoData.themes || LegoData.themes.length <= 0) {
             throw new Error(SET_EMPTY_MESSAGE);
         }
     }
@@ -45,6 +54,9 @@ class LegoData {
                         theme: this.getThemeNameById(singleData?.theme_id),
                     }
                 });
+
+                LegoData.themes = this.themeData;
+
                 resolve();
             } catch (error) {
                 return reject(`Fail to initialize the sets data with: ${error.message}`);
@@ -60,6 +72,32 @@ class LegoData {
                 return resolve(LegoData.sets);
             } catch (error) {
                 return reject(`Fail to get all dataset: ${error.message}`);
+            }
+        })
+    }
+
+    getAllThemes() {
+        return new Promise((resolve, reject) => {
+            try {
+                LegoData.validateEmptyDataThemes();
+
+                return resolve(LegoData.themes);
+            } catch (error) {
+                return reject(`Fail to get all themes: ${error.message}`);
+            }
+        })
+    }
+
+    getThemeById(id) {
+        return new Promise((resolve, reject) => {
+            try {
+                LegoData.validateEmptyDataThemes();
+
+                const foundTheme = LegoData.themes.find(item => item.id === id);
+
+                return resolve(foundTheme);
+            } catch (error) {
+                return reject(`Fail to get theme with ID ${id}: ${error.message}`);
             }
         })
     }
@@ -103,7 +141,7 @@ class LegoData {
                     reject("Set already exists");
                 } else {
                     // Add the new set
-                    LegoData.sets.push({
+                    LegoData.sets.unshift({
                         ...newSet,
                         theme: this.getThemeNameById(newSet.theme_id),
                     });
@@ -115,7 +153,7 @@ class LegoData {
         });
     }
 
-    removeSet(setNum) {
+    deleteSetByNum(setNum) {
         return new Promise((resolve, reject) => {
             try {
                 LegoData.validateEmptyDataset();

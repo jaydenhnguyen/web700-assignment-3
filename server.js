@@ -26,7 +26,7 @@ app.set('views', __dirname + '/views');
 
 /*Config API*/
 const send404Page = (res) => {
-    res.status(404).sendFile(path.join(__dirname, '/views/404.ejs'));
+    res.render('404');
 };
 
 app.get(['/', '/home'], (req, res) => {
@@ -49,8 +49,7 @@ app.get('/lego/sets', async (req, res) => {
             ? await legoData.getSetsByTheme(theme)
             : await legoData.getAllSets();
 
-        if (data && data.length > 0) return res.json(data);
-
+        if (data && data.length > 0) return res.render('sets', {sets: data});
         send404Page(res);
     } catch (error) {
         send404Page(res);

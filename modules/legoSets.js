@@ -153,7 +153,7 @@ class LegoData {
         });
     }
 
-    removeSet(setNum) {
+    deleteSetByNum(setNum) {
         return new Promise((resolve, reject) => {
             try {
                 LegoData.validateEmptyDataset();

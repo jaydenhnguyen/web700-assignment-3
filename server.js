@@ -14,7 +14,7 @@ const { LegoData } = require("./modules/legoSets");
 const express = require('express');
 const path = require('path');
 const e = require("express");
-const {response} = require("express");
+const {response, raw} = require("express");
 
 const app = express()
 const HTTP_PORT = 3000
@@ -37,8 +37,9 @@ app.get('/about', (req, res) => {
     res.render('about');
 });
 
-app.get('/lego/add-set', (req, res) => {
-    res.render('addSet');
+app.get('/lego/add-set', async (req, res) => {
+    const themes = await legoData.getAllThemes();
+    res.render("addSet", {themes:themes});
 });
 
 app.get('/lego/sets', async (req, res) => {
@@ -100,6 +101,17 @@ app.get('/lego/themes/:theme_id', async (req, res) => {
     }
 });
 
+app.get('/lego/deleteSet/:setNum', async (req, res) => {
+    const setNum = "123";
+
+    try {
+        await legoData.deleteSetByNum(setNum);
+        res.redirect('/lego/sets');
+    } catch (error) {
+        res.status(422).send(error);
+    }
+});
+
 app.get('/*', (req, res) => {
     res.render('404');
 });
@@ -109,21 +121,11 @@ app.get('/*', (req, res) => {
 
 app.post('/lego/add-set', async (req, res) => {
     const {set_num, name, year, theme_id, num_parts, img_url} = await req.body;
+    const foundTheme = await legoData.getThemeById(req.body.theme_id);
 
     try {
-        await legoData.addSet({set_num, name, year, theme_id, num_parts, img_url});
+        await legoData.addSet({set_num, name, year, theme_id, num_parts, img_url, theme: foundTheme?.name ?? 'Unknown Theme'});
         await res.redirect('/lego/sets');
-    } catch (error) {
-        res.status(422).send(error);
-    }
-});
-
-app.post('/lego/remove-test', async (req, res) => {
-    const setNum = "123";
-
-    try {
-        await legoData.removeSet(setNum);
-        res.redirect('/lego/sets');
     } catch (error) {
         res.status(422).send(error);
     }

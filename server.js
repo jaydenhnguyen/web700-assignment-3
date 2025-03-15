@@ -56,7 +56,7 @@ app.get('/lego/sets', async (req, res) => {
     }
 });
 
-app.get('/lego/sets/:set_num', async (req, res) => {
+app.get('/lego/set/:set_num', async (req, res) => {
     const { set_num } = req.params;
 
     try {
@@ -66,7 +66,7 @@ app.get('/lego/sets/:set_num', async (req, res) => {
             return send404Page(res);
         }
 
-        res.json(set);
+        res.render('set', {setDetail: set});
     } catch (error) {
         send404Page(res);
     }
@@ -100,10 +100,6 @@ app.get('/lego/themes/:theme_id', async (req, res) => {
     }
 });
 
-// app.get('/lego/add-test', (req, res) => {
-//     res.sendFile(path.join(__dirname, '/views/add-set-demo.ejs'));
-// });
-
 app.get('/*', (req, res) => {
     res.render('404');
 });
@@ -112,15 +108,6 @@ app.get('/*', (req, res) => {
 
 
 app.post('/lego/add-set', async (req, res) => {
-    const testSet = {
-        set_num: "123",
-        name: "Test Set Name",
-        year: "2024",
-        theme_id: "366",
-        num_parts: "500",
-        img_url: "https://fakeimg.pl/375x375?text=[+Lego+]"
-    };
-
     const {set_num, name, year, theme_id, num_parts, img_url} = await req.body;
 
     try {

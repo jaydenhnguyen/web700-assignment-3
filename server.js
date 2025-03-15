@@ -26,7 +26,7 @@ app.set('views', __dirname + '/views');
 
 /*Config API*/
 const send404Page = (res) => {
-    res.render('404');
+    res?.render('404');
 };
 
 app.get(['/', '/home'], (req, res) => {
@@ -102,18 +102,18 @@ app.get('/lego/themes/:theme_id', async (req, res) => {
 });
 
 app.get('/lego/deleteSet/:setNum', async (req, res) => {
-    const setNum = "123";
+    const { setNum } = req.params;
 
     try {
         await legoData.deleteSetByNum(setNum);
-        res.redirect('/lego/sets');
+        return res.redirect('/lego/sets');
     } catch (error) {
-        res.status(422).send(error);
+        return send404Page(res)
     }
 });
 
 app.get('/*', (req, res) => {
-    res.render('404');
+    return send404Page(res)
 });
 
 
@@ -127,7 +127,7 @@ app.post('/lego/add-set', async (req, res) => {
         await legoData.addSet({set_num, name, year, theme_id, num_parts, img_url, theme: foundTheme?.name ?? 'Unknown Theme'});
         await res.redirect('/lego/sets');
     } catch (error) {
-        res.status(422).send(error);
+        return send404Page()
     }
 });
 

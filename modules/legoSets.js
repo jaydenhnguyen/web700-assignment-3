@@ -141,7 +141,7 @@ class LegoData {
                     reject("Set already exists");
                 } else {
                     // Add the new set
-                    LegoData.sets.push({
+                    LegoData.sets.unshift({
                         ...newSet,
                         theme: this.getThemeNameById(newSet.theme_id),
                     });

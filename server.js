@@ -20,22 +20,25 @@ const app = express()
 const HTTP_PORT = 3000
 
 app.use(express.static(__dirname + '/public'))
+app.use(express.urlencoded({ extended: true }));
+app.set('view engine', 'ejs');
+app.set('views', __dirname + '/views');
 
 /*Config API*/
 const send404Page = (res) => {
-    res.status(404).sendFile(path.join(__dirname, '/views/404.html'));
+    res.status(404).sendFile(path.join(__dirname, '/views/404.ejs'));
 };
 
 app.get(['/', '/home'], (req, res) => {
-    res.sendFile(path.join(__dirname, '/views/home.html'));
+    res.render('home');
 });
 
 app.get('/about', (req, res) => {
-    res.sendFile(path.join(__dirname, '/views/about.html'));
+    res.render('about');
 });
 
 app.get('/lego/add-set', (req, res) => {
-    res.sendFile(path.join(__dirname, '/views/add-set.html'));
+    res.render('addSet');
 });
 
 app.get('/lego/sets', async (req, res) => {
@@ -98,16 +101,18 @@ app.get('/lego/themes/:theme_id', async (req, res) => {
     }
 });
 
-app.get('/lego/add-test', (req, res) => {
-    res.sendFile(path.join(__dirname, '/views/add-set-demo.html'));
-});
+// app.get('/lego/add-test', (req, res) => {
+//     res.sendFile(path.join(__dirname, '/views/add-set-demo.ejs'));
+// });
 
 app.get('/*', (req, res) => {
-    res.sendFile(path.join(__dirname, '/views/404.html'));
+    res.render('404');
 });
 
 
-app.post('/lego/add-test', async (req, res) => {
+
+
+app.post('/lego/add-set', async (req, res) => {
     const testSet = {
         set_num: "123",
         name: "Test Set Name",
@@ -117,9 +122,11 @@ app.post('/lego/add-test', async (req, res) => {
         img_url: "https://fakeimg.pl/375x375?text=[+Lego+]"
     };
 
+    const {set_num, name, year, theme_id, num_parts, img_url} = await req.body;
+
     try {
-        await legoData.addSet(testSet);
-        res.redirect('/lego/sets');
+        await legoData.addSet({set_num, name, year, theme_id, num_parts, img_url});
+        await res.redirect('/lego/sets');
     } catch (error) {
         res.status(422).send(error);
     }

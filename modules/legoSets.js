@@ -10,6 +10,9 @@
  *
  ********************************************************************************/
 
+const fs = require("fs");
+const path = require("path");
+
 const setDataJson = require("../data/setData.json");
 const themeDataJson = require("../data/themeData.json");
 
@@ -138,15 +141,44 @@ class LegoData {
                 const setExists = LegoData.sets.some(set => set.set_num === newSet.set_num);
 
                 if (setExists) {
-                    reject("Set already exists");
-                } else {
-                    // Add the new set
-                    LegoData.sets.unshift({
-                        ...newSet,
-                        theme: this.getThemeNameById(newSet.theme_id),
-                    });
-                    resolve();
+                    return reject("Set already exists");
                 }
+
+                // Create the new set object
+                const newSetWithTheme = {
+                    ...newSet,
+                    theme: this.getThemeNameById(newSet.theme_id),
+                };
+
+                // Add the new set to the in-memory dataset
+                LegoData.sets.unshift(newSetWithTheme);
+
+                const setDataFilePath = path.join(__dirname, "../data/setData.json");
+
+                // Read the current setData.json file
+                fs.readFile(setDataFilePath, "utf8", (err, data) => {
+                    if (err) {
+                        return reject(`Error reading JSON file: ${err.message}`);
+                    }
+
+                    let jsonData;
+                    try {
+                        jsonData = JSON.parse(data);
+                    } catch (parseErr) {
+                        return reject(`Error parsing JSON file: ${parseErr.message}`);
+                    }
+
+                    // Add the new set to the JSON data
+                    jsonData.unshift(newSetWithTheme);
+
+                    // Write the updated JSON data back to the file
+                    fs.writeFile(setDataFilePath, JSON.stringify(jsonData, null, 2), "utf8", (writeErr) => {
+                        if (writeErr) {
+                            return reject(`Error writing to JSON file: ${writeErr.message}`);
+                        }
+                        resolve();
+                    });
+                });
             } catch (error) {
                 reject(`Failed to add the set: ${error.message}`);
             }

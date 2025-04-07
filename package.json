@@ -1,5 +1,5 @@
 {
-  "name": "assignment_4",
+  "name": "assignment_6",
   "version": "1.0.0",
   "description": "Great Assignment",
   "main": "server.js",
@@ -14,9 +14,13 @@
   "author": "Huu Duc Huy Nguyen",
   "license": "ISC",
   "dependencies": {
+    "dotenv": "^16.4.7",
     "ejs": "^3.1.10",
     "express": "^4.21.2",
-    "postcss-cli": "^11.0.0"
+    "pg": "^8.14.1",
+    "pg-hstore": "^2.3.4",
+    "postcss-cli": "^11.0.0",
+    "sequelize": "^6.37.7"
   },
   "devDependencies": {
     "autoprefixer": "^10.4.20",

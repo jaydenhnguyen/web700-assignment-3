@@ -1,20 +1,17 @@
 /********************************************************************************
- * WEB700 – Assignment 5
+ * WEB700 – Assignment 6
  *
  * I declare that this assignment is my own work in accordance with Seneca's
  * Academic Integrity Policy:
  *
  * https://www.senecapolytechnic.ca/about/policies/academic-integrity-policy.html
  *
- * Name: Huu Duc Huy Nguyen | Student ID: 125109249 | Date: 14th, Mar, 2025
+ * Name: Huu Duc Huy Nguyen | Student ID: 125109249 | Date: 6th, Apr, 2025
  *
  ********************************************************************************/
 
 const { LegoData } = require("./modules/legoSets");
 const express = require('express');
-const path = require('path');
-const e = require("express");
-const {response, raw} = require("express");
 
 const app = express()
 const HTTP_PORT = 3000
@@ -25,8 +22,13 @@ app.set('view engine', 'ejs');
 app.set('views', __dirname + '/views');
 
 /*Config API*/
-const send404Page = (res) => {
-    res?.render('404');
+const send404Page = (res, message ="I'm sorry, we're unable to find what you're looking for.") => {
+    res?.render('404',{message});
+};
+
+/*Config API*/
+const send505Page = (res, message ="Internal Server Error") => {
+    res?.render('505',{message});
 };
 
 app.get(['/', '/home'], (req, res) => {
@@ -85,22 +87,6 @@ app.get('/lego/themes', async (req, res) => {
     }
 });
 
-app.get('/lego/themes/:theme_id', async (req, res) => {
-    const { theme_id } = req.params;
-
-    try {
-        const theme = await legoData.getThemeById(theme_id);
-
-        if (!theme) {
-            return res.send({code: 404, message: 'Unable to find requested theme'});
-        }
-
-        res.json(theme);
-    } catch (error) {
-        send404Page(res);
-    }
-});
-
 app.get('/lego/deleteSet/:setNum', async (req, res) => {
     const { setNum } = req.params;
 
@@ -108,7 +94,7 @@ app.get('/lego/deleteSet/:setNum', async (req, res) => {
         await legoData.deleteSetByNum(setNum);
         return res.redirect('/lego/sets');
     } catch (error) {
-        return send404Page(res)
+        return send505Page(res, error)
     }
 });
 
@@ -121,13 +107,11 @@ app.get('/*', (req, res) => {
 
 app.post('/lego/add-set', async (req, res) => {
     const {set_num, name, year, theme_id, num_parts, img_url} = await req.body;
-    const foundTheme = await legoData.getThemeById(req.body.theme_id);
-
     try {
-        await legoData.addSet({set_num, name, year, theme_id, num_parts, img_url, theme: foundTheme?.name ?? 'Unknown Theme'});
+        await legoData.addSet({set_num, name, year, theme_id, num_parts, img_url});
         await res.redirect('/lego/sets');
     } catch (error) {
-        return send404Page()
+        return send505Page(res, error);
     }
 });
 
